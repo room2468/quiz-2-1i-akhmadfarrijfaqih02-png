@@ -5,24 +5,26 @@ highest_user=""
 highest_size=-1
 users_over_1000=0
 
-# Membaca data penggunaan disk pengguna dari stdin
-while IFS= read -r line; do
+while IFS= read -r line || [[ -n "$line" ]]; do
     [[ -z "$line" ]] && continue
     
     read -r username size <<< "$line"
-    (( total += size ))
     
-    if (( size > highest_size )); then
-        highest_size=$size
-        highest_user=$username
-    fi
-    
-    if (( size > 1000 )); then
-        (( users_over_1000++ ))
+    # Validasi memastikan size adalah angka
+    if [[ -n "$size" ]]; then
+        (( total += size ))
+        
+        if (( size > highest_size )); then
+            highest_size=$size
+            highest_user=$username
+        fi
+        
+        if (( size > 1000 )); then
+            (( users_over_1000++ ))
+        fi
     fi
 done
 
-# Cetak laporan akhir
 echo "Total usage: $total MB"
 echo "Highest user: $highest_user ($highest_size MB)"
 echo "Users over 1000 MB: $users_over_1000"

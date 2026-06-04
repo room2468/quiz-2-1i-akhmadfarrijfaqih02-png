@@ -5,9 +5,13 @@ logs=0
 configs=0
 others=0
 
-# Membaca daftar nama file baris demi baris dari stdin
-while IFS= read -r filename; do
+# Membaca baris demi baris secara utuh (termasuk spasi)
+while IFS= read -r filename || [[ -n "$filename" ]]; do
+    # Abaikan jika baris benar-benar kosong
     [[ -z "$filename" ]] && continue
+    
+    # Hapus spasi di awal dan di akhir string untuk akurasi pencocokan
+    filename=$(echo "$filename" | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')
     
     case "$filename" in
         *.sh)   (( scripts++ )) ;;
@@ -17,7 +21,6 @@ while IFS= read -r filename; do
     esac
 done
 
-# Cetak hasil klasifikasi file
 echo "Scripts (.sh): $scripts"
 echo "Logs (.log): $logs"
 echo "Configs (.conf): $configs"
